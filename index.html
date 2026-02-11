@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ระบบด่า กกต.</title>
+    <title>ระบบด่า กกต. - Lishborn Final</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
@@ -118,7 +118,7 @@
             "บัตรเขย่งหรือคนเขย่งครับเนี่ย",
             "ขอเครื่องคิดเลขใหม่ไหมครับ?",
             "Loading 99%... (ค้างมา 4 ปีแล้ว)",
-            "Error 404: Transparency Not Found",
+            /* ลบคำว่า Error ออกแล้วครับ */
             "ต้องใช้ AI ช่วยทำงาน หรือต้องใช้คนมี I ทำงานครับ?"
         ];
         const SUBJECTS = ["กกต.", "7 เสือ", "คณะกรรมการฯ", "คนจัดเลือกตั้ง", "ระบบรายงานผล", "งบ 6 พันล้าน", "บัตรเลือกตั้ง", "ความโปร่งใส", "คนนับคะแนน", "เครื่องคิดเลข", "เซิร์ฟเวอร์", "ผู้มีอำนาจ", "ตรรกะพวกคุณ", "การทำงานของท่าน", "ระเบียบการเลือกตั้ง", "บัตรเขย่ง", "ผลคะแนน", "สมองคนคิด", "ภาษีประชาชน", "ความรับผิดชอบ"];
@@ -235,6 +235,7 @@
                     <div className="flex justify-between items-center px-4 py-3 border-b border-gray-800/50 bg-black/20">
                         <div className="flex items-center gap-3">
                             <div className={`w-2 h-2 rounded-full ${autoLoop ? 'bg-red-500 animate-pulse glow-box' : 'bg-green-500'}`}></div>
+                            {/* --- แก้ตรงนี้เป็น LISHBORN --- */}
                             <span className="text-xs font-bold text-gray-400 font-['Rajdhani'] tracking-[2px]">LISHBORN</span>
                         </div>
                         <div className="flex items-center gap-4">
@@ -259,7 +260,6 @@
                                 <PixelGhost active={autoLoop || isTyping} />
                             </div>
                             
-                            {/* --- ส่วนที่แก้: เปลี่ยนข้อความตรงนี้ --- */}
                             <p className="text-cyan-500/70 text-xs font-['Kanit'] tracking-widest mt-2">OPUS 4.5 ระบบด่าหมา</p>
                         </div>
 
