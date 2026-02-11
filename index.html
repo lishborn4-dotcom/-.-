@@ -3,90 +3,170 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lishborn</title>
+    <title>ระบบด่า กกต. - Lishborn Final</title>
+    
     <script src="https://cdn.tailwindcss.com"></script>
     <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@100..800&family=Kanit:wght@300;400;600;800&family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
+
     <style>
-        body { font-family: 'Menlo', 'Monaco', 'Courier New', monospace; background-color: #101010; }
-        @keyframes bounce-slow { 0%, 100% { transform: scale(1.25) translateY(0); } 50% { transform: scale(1.25) translateY(-5px); } }
-        .animate-bounce-slow { animation: bounce-slow 3s infinite; }
-        .input-cursor { caret-color: #ef4444; }
+        :root {
+            --primary: #ef4444; 
+            --glow: rgba(239, 68, 68, 0.6);
+            --bg-dark: #030303;
+            --panel-bg: rgba(10, 10, 12, 0.85);
+        }
+
+        body {
+            font-family: 'JetBrains Mono', 'Kanit', monospace;
+            background-color: var(--bg-dark);
+            color: #e5e5e5;
+            overflow: hidden;
+            height: 100vh;
+            width: 100vw;
+        }
+
+        /* --- Cyber Grid Background --- */
+        .cyber-grid {
+            position: fixed; top: 0; left: 0; width: 200vw; height: 200vh;
+            background-image: 
+                linear-gradient(rgba(20, 20, 20, 1) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(20, 20, 20, 1) 1px, transparent 1px);
+            background-size: 40px 40px;
+            background-position: center;
+            transform: perspective(500px) rotateX(60deg) translateY(-100px) translateZ(-200px);
+            animation: grid-move 20s linear infinite;
+            z-index: -1;
+            opacity: 0.4;
+            pointer-events: none;
+        }
+        @keyframes grid-move { 0% { transform: perspective(500px) rotateX(60deg) translateY(0) translateZ(-200px); } 100% { transform: perspective(500px) rotateX(60deg) translateY(40px) translateZ(-200px); } }
+
+        /* --- HUD Panel --- */
+        .hud-panel {
+            background: var(--panel-bg);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 0 40px rgba(0,0,0,0.8), inset 0 0 0 1px rgba(255,255,255,0.05);
+            position: relative;
+            overflow: hidden;
+        }
+        .hud-panel::before { 
+            content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 2px;
+            background: linear-gradient(90deg, transparent, var(--primary), transparent);
+            animation: scan-horizontal 4s ease-in-out infinite;
+            opacity: 0.5;
+        }
+
+        .glow-text { text-shadow: 0 0 10px var(--glow); }
+        .glow-box { box-shadow: 0 0 15px var(--glow); }
+
+        /* --- Scrollbar --- */
+        .custom-scroll::-webkit-scrollbar { width: 4px; }
+        .custom-scroll::-webkit-scrollbar-track { background: rgba(0,0,0,0.3); }
+        .custom-scroll::-webkit-scrollbar-thumb { background: #333; border-radius: 2px; }
+        .custom-scroll::-webkit-scrollbar-thumb:hover { background: var(--primary); }
+
+        /* --- Animations --- */
+        @keyframes pulse-fast { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+        .animate-pulse-fast { animation: pulse-fast 0.5s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
+        
+        @keyframes bar-fill { 0% { width: 0%; } 100% { width: 100%; } }
+        .fill-animation { animation: bar-fill 1.5s linear infinite; }
+
+        @keyframes glitch {
+            0% { transform: translate(0) }
+            20% { transform: translate(-2px, 2px) }
+            40% { transform: translate(-2px, -2px) }
+            60% { transform: translate(2px, 2px) }
+            80% { transform: translate(2px, -2px) }
+            100% { transform: translate(0) }
+        }
+        .glitch-active { animation: glitch 0.2s cubic-bezier(.25, .46, .45, .94) both infinite; }
+
+        /* --- Corners --- */
+        .corner { position: absolute; width: 10px; height: 10px; border-color: var(--primary); border-style: solid; transition: all 0.3s; opacity: 0.7; }
+        .tl { top: 0; left: 0; border-width: 2px 0 0 2px; }
+        .tr { top: 0; right: 0; border-width: 2px 2px 0 0; }
+        .bl { bottom: 0; left: 0; border-width: 0 0 2px 2px; }
+        .br { bottom: 0; right: 0; border-width: 0 2px 2px 0; }
+        .hud-panel:hover .corner { width: 20px; height: 20px; opacity: 1; box-shadow: 0 0 10px var(--glow); }
+
     </style>
 </head>
-<body>
-    <div id="root"></div>
+<body class="flex items-center justify-center">
+
+    <div class="cyber-grid"></div>
+    <div id="root" class="relative z-10 w-full max-w-3xl p-4"></div>
 
     <script type="text/babel">
         const { useState, useEffect, useRef } = React;
 
-        // --- คำศัพท์ ---
-        const SUBJECTS = [
-            "กกต.", "7 เสือ", "คณะกรรมการฯ", "คนจัดเลือกตั้ง", "ระบบรายงานผล", 
-            "งบ 6 พันล้าน", "บัตรเลือกตั้ง", "ความโปร่งใส", "คนนับคะแนน", 
-            "เครื่องคิดเลข", "เซิร์ฟเวอร์", "ผู้มีอำนาจ", "ตรรกะพวกคุณ", 
-            "การทำงานของท่าน", "ระเบียบการเลือกตั้ง", "บัตรเขย่ง", "ผลคะแนน", 
-            "สมองคนคิด", "ภาษีประชาชน", "ความรับผิดชอบ"
+        const PRESET_PHRASES = [
+            "7 เสือ เหมือน 7 เหี้ย",
+            "4 ปีทำงานใหญ่แค่ครั้งเดียวยังบกพร่อง",
+            "ไม่โปร่งใส ตรวจสอบไม่ได้",
+            "กกต. = โกงการเลือกตั้ง",
+            "อยากเอา กกต. ไปซักว่ะ สกปรกเกิน",
+            "ออกแบบให้แย่ยังไงก็ได้เพราะยังไงก็ไม่แย่กว่าแม่มแล้ว",
+            "งบประมาณพันล้าน ได้งานหลักร้อย",
+            "บัตรเขย่งหรือคนเขย่งครับเนี่ย",
+            "ขอเครื่องคิดเลขใหม่ไหมครับ?",
+            "Loading 99%... (ค้างมา 4 ปีแล้ว)",
+            "Error 404: Transparency Not Found",
+            "ต้องใช้ AI ช่วยทำงาน หรือต้องใช้คนมี I ทำงานครับ?"
         ];
-        const VERBS = [
-            "หายไปไหนหมด", "ทำงานเหมือนเต่า", "แดกงบไปเท่าไหร่", "คำนวณมั่วซั่ว", 
-            "พังพินาศ", "หมาไม่แดก", "ล่มเก่งเหลือเกิน", "พักผ่อนอยู่เหรอ", 
-            "ดูงานเมืองนอก", "ไร้ประสิทธิภาพ", "หน้าด้านจริงๆ", "ทำอะไรกันอยู่", 
-            "โกงหน้าด้านๆ", "ปัดความรับผิดชอบ", "คิดเลขไม่เป็น", "ซ่อนคะแนน", 
-            "หน่วงความเจริญ", "ถ่วงเวลา", "ไม่เห็นหัวประชาชน", "ทำงานชุ่ยๆ"
-        ];
-        const OBJECTS = [
-            "ครับท่าน", "จนน่าเกลียด", "แบบงงๆ", "ยับเยิน", "ชิบหายวายป่วง", 
-            "จนกูงง", "ไม่อายฟ้าดิน", "ให้เด็กอนุบาลทำยังดีกว่า", "เสียดายภาษี", 
-            "น่าสมเพช", "เละเทะไปหมด", "ทุเรศลูกตา", "เกินเยียวยา", 
-            "แบบไร้ยางอาย", "เห็นแล้วท้อ", "มืดมนอนธการ", "ต่ำตม", 
-            "หาความเจริญไม่เจอ", "เน่าเฟะ", "อัปยศอดสู"
-        ];
-        const ENDINGS = [
-            "ไอ้สัส", "ไอ้เวร", "ควยยย", "ถุย", "ลาออกไปเถอะ", "ถามจริ๊ง?", 
-            "เลิกตอแหลได้แล้ว", "เอาตีนคิดเหรอ", "จริงๆ นะจ๊ะ", "ส้นตีนมาก", 
-            "เหนื่อยใจว่ะ", "ขอร้องล่ะ", "จบนะ", "อย่าแถ", "จำใส่สมองไว้", 
-            "ประชาชนดูอยู่", "บาปกรรมมีจริง", "อายหมามันบ้าง", "ไอ้หน้าไม่อาย", "สาสสส"
-        ];
+        const SUBJECTS = ["กกต.", "7 เสือ", "คณะกรรมการฯ", "คนจัดเลือกตั้ง", "ระบบรายงานผล", "งบ 6 พันล้าน", "บัตรเลือกตั้ง", "ความโปร่งใส", "คนนับคะแนน", "เครื่องคิดเลข", "เซิร์ฟเวอร์", "ผู้มีอำนาจ", "ตรรกะพวกคุณ", "การทำงานของท่าน", "ระเบียบการเลือกตั้ง", "บัตรเขย่ง", "ผลคะแนน", "สมองคนคิด", "ภาษีประชาชน", "ความรับผิดชอบ"];
+        const VERBS = ["หายไปไหนหมด", "ทำงานเหมือนเต่า", "แดกงบไปเท่าไหร่", "คำนวณมั่วซั่ว", "พังพินาศ", "หมาไม่แดก", "ล่มเก่งเหลือเกิน", "พักผ่อนอยู่เหรอ", "ดูงานเมืองนอก", "ไร้ประสิทธิภาพ", "หน้าด้านจริงๆ", "ทำอะไรกันอยู่", "โกงหน้าด้านๆ", "ปัดความรับผิดชอบ", "คิดเลขไม่เป็น", "ซ่อนคะแนน", "หน่วงความเจริญ", "ถ่วงเวลา", "ไม่เห็นหัวประชาชน", "ทำงานชุ่ยๆ"];
+        const OBJECTS = ["ครับท่าน", "จนน่าเกลียด", "แบบงงๆ", "ยับเยิน", "ชิบหายวายปวง", "จนกูงง", "ไม่อายฟ้าดิน", "ให้เด็กอนุบาลทำยังดีกว่า", "เสียดายภาษี", "น่าสมเพช", "เละเทะไปหมด", "ทุเรศลูกตา", "เกินเยียวยา", "แบบไร้ยางอาย", "เห็นแล้วท้อ", "มืดมนอนธการ", "ต่ำตม", "หาความเจริญไม่เจอ", "เน่าเฟะ", "อัปยศอดสู"];
+        const ENDINGS = ["ไอ้สัส", "ไอ้เวร", "ควยยย", "ถุย", "ลาออกไปเถอะ", "ถามจริ๊ง?", "เลิกตอแหลได้แล้ว", "เอาตีนคิดเหรอ", "จริงๆ นะจ๊ะ", "ส้นตีนมาก", "เหนื่อยใจว่ะ", "ขอร้องล่ะ", "จบนะ", "อย่าแถ", "จำใส่สมองไว้", "ประชาชนดูอยู่", "บาปกรรมมีจริง", "อายหมามันบ้าง", "ไอ้หน้าไม่อาย", "สาสสส"];
 
-        const PixelGhost = () => (
-            <svg width="64" height="64" viewBox="0 0 14 14" fill="none" className="text-red-500">
+        const CopyIcon = () => (<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>);
+
+        const PixelGhost = ({ active }) => (
+            <svg width="64" height="64" viewBox="0 0 14 14" fill="none" className={`text-red-500 transition-all duration-300 ${active ? 'filter drop-shadow-[0_0_10px_rgba(239,68,68,0.8)] scale-110' : 'opacity-80'}`}>
                 <path d="M4 2H10V3H11V4H12V9H11V10H10V11H9V10H8V9H6V10H5V11H4V10H3V9H2V4H3V3H4V2Z" fill="currentColor"/>
                 <rect x="4" y="5" width="2" height="2" fill="black"/><rect x="8" y="5" width="2" height="2" fill="black"/>
-                <rect x="4" y="6" width="1" height="1" fill="white"/><rect x="8" y="6" width="1" height="1" fill="white"/>
+                <rect x="4" y="6" width="1" height="1" fill="#fff" className={active ? "animate-pulse" : ""}/><rect x="8" y="6" width="1" height="1" fill="#fff" className={active ? "animate-pulse" : ""}/>
             </svg>
+        );
+
+        // Fake Audio Visualizer
+        const Visualizer = ({ active }) => (
+            <div className="flex gap-1 items-end h-6">
+                {[...Array(5)].map((_, i) => (
+                    <div key={i} className={`w-1 bg-red-500 transition-all duration-100 ${active ? 'animate-pulse-fast' : 'h-1 opacity-30'}`} style={{height: active ? `${Math.random() * 100}%` : '4px', animationDelay: `${i * 0.1}s`}}></div>
+                ))}
+            </div>
         );
 
         function App() {
             const [displayedText, setDisplayedText] = useState("");
             const [isTyping, setIsTyping] = useState(false);
-            const [cursorVisible, setCursorVisible] = useState(true);
             const [autoLoop, setAutoLoop] = useState(false);
             const [history, setHistory] = useState([]);
-            
-            // ส่วนเพิ่มคำเอง
             const [inputMode, setInputMode] = useState(false);
             const [customPhrases, setCustomPhrases] = useState([]);
             const [customInput, setCustomInput] = useState("");
-            const inputRef = useRef(null);
-
+            const [insultCount, setInsultCount] = useState(0);
+            
             const typingIntervalRef = useRef(null);
             const autoLoopRef = useRef(null);
+            const inputRef = useRef(null);
 
-            // ฟังก์ชันสุ่มประโยค (รวม logic ผสมคำ + คำที่ผู้ใช้เพิ่ม)
             const generateText = () => {
-                // 30% โอกาสที่จะเลือกคำจากที่ผู้ใช้พิมพ์เพิ่ม (ถ้ามี)
-                if (customPhrases.length > 0 && Math.random() < 0.3) {
-                    return customPhrases[Math.floor(Math.random() * customPhrases.length)];
-                }
-
-                // 70% (หรือถ้าไม่มีคำเพิ่ม) ให้ AI ผสมคำเอง
+                const rand = Math.random();
+                if (customPhrases.length > 0 && rand < 0.2) return customPhrases[Math.floor(Math.random() * customPhrases.length)];
+                if (rand < 0.5) return PRESET_PHRASES[Math.floor(Math.random() * PRESET_PHRASES.length)];
                 const s = SUBJECTS[Math.floor(Math.random() * SUBJECTS.length)];
                 const v = VERBS[Math.floor(Math.random() * VERBS.length)];
                 const o = OBJECTS[Math.floor(Math.random() * OBJECTS.length)];
                 const e = Math.random() > 0.5 ? " " + ENDINGS[Math.floor(Math.random() * ENDINGS.length)] : "";
-                
                 return `${s} ${v} ${o}${e}`;
             };
 
@@ -94,13 +174,16 @@
                 if (inputMode) return;
                 if (typingIntervalRef.current) clearInterval(typingIntervalRef.current);
                 
-                setIsTyping(true);
-                setDisplayedText(""); 
-                
-                const targetText = generateText();
-                let charIndex = 0;
-                let currentString = "";
+                // Trigger Glitch on main container
+                const container = document.getElementById('main-container');
+                if(container) {
+                    container.classList.add('glitch-active');
+                    setTimeout(() => container.classList.remove('glitch-active'), 200);
+                }
 
+                setIsTyping(true); setDisplayedText(""); 
+                const targetText = generateText();
+                let charIndex = 0; let currentString = "";
                 typingIntervalRef.current = setInterval(() => {
                     if (charIndex < targetText.length) {
                         currentString += targetText.charAt(charIndex);
@@ -109,23 +192,19 @@
                     } else {
                         clearInterval(typingIntervalRef.current);
                         setIsTyping(false);
-                        setHistory(prev => [targetText, ...prev].slice(0, 50));
-
+                        setHistory(prev => [targetText, ...prev].slice(0, 30));
+                        setInsultCount(prev => prev + 1);
                         if (autoLoopRef.current && !inputMode) {
-                            setTimeout(() => {
-                                if (autoLoopRef.current && !inputMode) startTyping();
-                            }, 2000); // พัก 2 วิแล้วด่าต่อ
+                            setTimeout(() => { if (autoLoopRef.current && !inputMode) startTyping(); }, 1500);
                         }
                     }
-                }, 30); 
+                }, 20);
             };
 
             const toggleAutoLoop = (e) => {
                 e.stopPropagation();
                 if (inputMode) return;
-                const newState = !autoLoop;
-                setAutoLoop(newState);
-                autoLoopRef.current = newState;
+                const newState = !autoLoop; setAutoLoop(newState); autoLoopRef.current = newState;
                 if (newState && !isTyping) startTyping();
             };
 
@@ -133,121 +212,113 @@
                 e.preventDefault();
                 if (customInput.trim()) {
                     setCustomPhrases(prev => [...prev, customInput]);
-                    setDisplayedText(`> System Update: Added "${customInput}" to database.`);
-                    setCustomInput("");
-                    setInputMode(false);
-                    // ปิด Auto Loop ชั่วคราวเพื่อให้เห็นข้อความยืนยัน
-                    if(autoLoop) {
-                        setTimeout(() => { if(autoLoopRef.current) startTyping(); }, 2500);
-                    }
+                    setDisplayedText(`> SYSTEM: เพิ่ม "${customInput}" เข้าระบบสำเร็จ`);
+                    setCustomInput(""); setInputMode(false);
+                    if(autoLoop) setTimeout(() => { if(autoLoopRef.current) startTyping(); }, 2000);
                 }
             };
 
-            useEffect(() => {
-                const interval = setInterval(() => setCursorVisible(v => !v), 530);
-                setTimeout(() => startTyping(), 200);
-                return () => clearInterval(interval);
-            }, []);
+            const copyToClipboard = (e) => {
+                e.stopPropagation(); navigator.clipboard.writeText(displayedText); alert("คัดลอกข้อความแล้ว!");
+            };
 
-            useEffect(() => {
-                if (inputMode && inputRef.current) inputRef.current.focus();
-            }, [inputMode]);
+            useEffect(() => { setTimeout(() => startTyping(), 800); return () => clearInterval(typingIntervalRef.current); }, []);
+            useEffect(() => { if (inputMode && inputRef.current) inputRef.current.focus(); }, [inputMode]);
 
             return (
-                <div className="min-h-screen text-gray-300 flex items-center justify-center p-4"
-                     onClick={() => !isTyping && !inputMode && startTyping()}>
-                    <div className="w-full max-w-2xl">
+                <div id="main-container" className="w-full hud-panel rounded-xl shadow-2xl relative group transition-all duration-500" onClick={() => !isTyping && !inputMode && startTyping()}>
+                    
+                    {/* Corners HUD */}
+                    <div className="corner tl"></div><div className="corner tr"></div><div className="corner bl"></div><div className="corner br"></div>
+
+                    {/* Top Status Bar */}
+                    <div className="flex justify-between items-center px-4 py-3 border-b border-gray-800/50 bg-black/20">
+                        <div className="flex items-center gap-3">
+                            <div className={`w-2 h-2 rounded-full ${autoLoop ? 'bg-red-500 animate-pulse glow-box' : 'bg-green-500'}`}></div>
+                            <span className="text-xs font-bold text-gray-400 font-['Rajdhani'] tracking-[2px]">LISHBORN_SYS_V7.2</span>
+                        </div>
+                        <div className="flex items-center gap-4">
+                            <Visualizer active={isTyping} />
+                            <div className="text-xs font-mono text-gray-500">INSULTS: <span className="text-red-500 font-bold">{insultCount.toString().padStart(4, '0')}</span></div>
+                        </div>
+                    </div>
+
+                    <div className="p-6 md:p-8 flex flex-col items-center relative z-10">
                         
-                        {/* Header Box */}
-                        <div className={`relative border rounded-xl pt-16 pb-12 px-8 flex flex-col items-center justify-center gap-6 bg-[#101010] transition-all duration-300 ${inputMode ? 'border-yellow-500 shadow-[0_0_15px_rgba(234,179,8,0.3)]' : (autoLoop ? 'border-red-500 shadow-[0_0_15px_rgba(239,68,68,0.3)]' : 'border-red-500/40')}`}>
-                            
-                            <div className="absolute -top-3 left-8 px-2 bg-[#101010]">
-                                <span className={`${inputMode ? 'text-yellow-500' : 'text-red-400/80'} text-sm tracking-wide`}>
-                                    {inputMode ? 'Lishborn : Input Mode' : 'Lishborn System'}
-                                </span>
-                            </div>
+                        {/* Mode Indicator Badge */}
+                        <div className="mb-6 px-3 py-1 bg-red-950/30 border border-red-500/20 rounded text-[10px] tracking-widest text-red-400 uppercase font-bold font-['Kanit']">
+                            {inputMode ? 'สถานะ: โหมดพิมพ์เอง' : (autoLoop ? 'สถานะ: ด่ากราดอัตโนมัติ' : 'สถานะ: พร้อมทำงาน')}
+                        </div>
 
-                            <h1 className="text-xl text-gray-200 font-bold tracking-tight">
-                                {inputMode ? 'Override Protocol' : (autoLoop ? '🔥 RAMPAGE MODE 🔥' : 'Welcome back')}
+                        {/* Title & Ghost */}
+                        <div className="flex flex-col items-center gap-4 mb-8">
+                            <h1 className="text-4xl md:text-5xl text-white font-black tracking-tighter glow-text uppercase font-['Rajdhani'] italic">
+                                {inputMode ? 'INJECT_DATA' : 'LISHBORN'}
                             </h1>
-
-                            <div className={`transform scale-125 my-2 ${autoLoop && !inputMode ? 'animate-pulse' : 'animate-bounce-slow'}`}>
-                                <PixelGhost />
+                            <div className="cursor-pointer hover:scale-110 transition-transform duration-300">
+                                <PixelGhost active={autoLoop || isTyping} />
                             </div>
-
-                            <div className="text-center space-y-1">
-                                <p className="text-gray-400 font-medium">Opus 4.5 Ultimate</p>
-                                <p className="text-gray-500 text-sm">
-                                    {inputMode ? 'Waiting for manual input...' : `Database: 160,000+ | Custom: ${customPhrases.length}`}
-                                </p>
-                            </div>
+                            
+                            {/* --- ส่วนที่แก้: เปลี่ยนข้อความตรงนี้ --- */}
+                            <p className="text-cyan-500/70 text-xs font-['Kanit'] tracking-widest mt-2">OPUS 4.5 ระบบด่าหมา</p>
                         </div>
 
-                        {/* Terminal Area */}
-                        <div className="mt-10 px-2 space-y-3">
-                            <div className="text-gray-500 text-sm mb-4">Targeting System: Active</div>
-                            <div className="h-px w-full bg-gray-800 mb-4"></div>
-
-                            <div className="flex items-center gap-3 text-lg">
-                                <span className={`${inputMode ? 'text-yellow-500' : 'text-gray-500'} font-bold`}>❯</span>
-                                <span className="text-gray-200">
-                                    {inputMode ? 'เพิ่มข้อมูลคำด่า:' : 'สร้างระบบด่ากกต.อัตโนมัติ'}
-                                </span>
-                            </div>
-
-                            <div className="text-lg text-red-400 font-medium pl-6 relative min-h-[30px]">
-                                {inputMode ? (
-                                    <form onSubmit={handleAddCustom} className="flex items-center">
-                                        <input 
-                                            ref={inputRef}
-                                            type="text" 
-                                            className="bg-transparent border-none outline-none text-yellow-100 w-full placeholder-gray-600 input-cursor"
-                                            placeholder="พิมพ์ข้อความที่นี่..."
-                                            value={customInput}
-                                            onChange={(e) => setCustomInput(e.target.value)}
-                                            onBlur={() => { if(!customInput) setInputMode(false); }}
-                                        />
-                                    </form>
-                                ) : (
-                                    <>
-                                        <span className={`inline-block w-2.5 h-6 ${inputMode ? 'bg-yellow-500' : 'bg-red-500'} align-middle mr-1 transition-opacity ${cursorVisible ? 'opacity-100' : 'opacity-0'}`}></span>
-                                        <span>{displayedText}</span>
-                                    </>
-                                )}
-                            </div>
-
-                            {/* History Log */}
-                            {!inputMode && (
-                                <div className="pl-8 pt-4 space-y-2 opacity-50 text-sm font-mono text-gray-600">
-                                    {history.slice(0, 2).map((item, idx) => (
-                                        <div key={idx}>$ {item}</div>
-                                    ))}
+                        {/* Main Display Terminal */}
+                        <div className="w-full relative bg-black/60 border border-gray-800 rounded-lg p-1 overflow-hidden">
+                            {/* Auto Loop Progress Bar */}
+                            {autoLoop && !isTyping && <div className="absolute top-0 left-0 h-[2px] bg-red-500 fill-animation z-20"></div>}
+                            
+                            <div className="bg-gradient-to-b from-gray-900/50 to-black p-6 rounded min-h-[140px] flex flex-col justify-between relative">
+                                <div className="flex items-center gap-2 text-gray-500 text-xs mb-4 border-b border-gray-800/50 pb-2 font-['Kanit']">
+                                    <span className="text-red-500 text-sm">❯</span>
+                                    <span className="tracking-wide">สร้างระบบด่า กกต. อัตโนมัติ</span>
                                 </div>
-                            )}
+
+                                <div className="text-xl md:text-2xl font-bold text-gray-100 leading-relaxed break-words font-['Kanit'] tracking-wide">
+                                    {inputMode ? (
+                                        <form onSubmit={handleAddCustom} className="w-full">
+                                            <input ref={inputRef} type="text" className="w-full bg-transparent border-none outline-none text-yellow-400 placeholder-gray-700 font-['Kanit']" placeholder="พิมพ์คำด่าที่นี่..." value={customInput} onChange={(e) => setCustomInput(e.target.value)} onBlur={() => { if(!customInput) setInputMode(false); }}/>
+                                        </form>
+                                    ) : (
+                                        <div className="flex items-start justify-between gap-2">
+                                            <div>
+                                                <span className="text-red-500 mr-2 opacity-80">></span>{displayedText}
+                                                <span className={`inline-block w-2 h-5 bg-red-500 align-middle ml-1 ${isTyping ? 'opacity-100' : 'animate-pulse'}`}></span>
+                                            </div>
+                                            {!isTyping && displayedText && ( <button onClick={copyToClipboard} className="text-gray-600 hover:text-white transition-colors p-2 rounded hover:bg-gray-800" title="คัดลอก"><CopyIcon /></button> )}
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
                         </div>
+
+                        {/* History Log */}
+                        {!inputMode && (
+                            <div className="w-full mt-4 bg-black/40 border-t border-gray-800 p-3 h-32 overflow-y-auto flex flex-col-reverse custom-scroll font-['Kanit']">
+                                {history.map((h, i) => (
+                                    <div key={i} className="py-2 border-b border-gray-800/30 flex flex-col items-start gap-1 hover:bg-white/5 transition-colors group">
+                                        <span className="text-cyan-800 font-mono text-[9px] pt-1 group-hover:text-cyan-500">[{new Date().toLocaleTimeString()}]</span>
+                                        <span className="text-gray-400 text-sm leading-snug tracking-wide group-hover:text-gray-200">{h}</span>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
 
                         {/* Controls */}
-                        <div className="mt-16 px-2 flex flex-col items-center gap-4 text-xs font-medium opacity-70">
+                        <div className="flex flex-wrap justify-center gap-3 w-full mt-6">
+                            <button onClick={(e) => { e.stopPropagation(); setInputMode(true); setAutoLoop(false); autoLoopRef.current = false; }} className="flex-1 min-w-[140px] py-3 bg-gray-900 border border-gray-700 text-gray-400 rounded hover:bg-gray-800 hover:border-yellow-500 hover:text-yellow-400 transition-all font-bold text-sm tracking-wide font-['Kanit'] group relative overflow-hidden">
+                                <span className="relative z-10">+ เพิ่มคำด่าเอง</span>
+                                <div className="absolute inset-0 bg-yellow-500/10 transform -translate-x-full group-hover:translate-x-0 transition-transform duration-300"></div>
+                            </button>
                             
-                            <div className="flex gap-3">
-                                <button 
-                                    onClick={(e) => { e.stopPropagation(); setInputMode(true); setAutoLoop(false); autoLoopRef.current = false; }}
-                                    className="px-4 py-2 border border-gray-700 rounded hover:bg-gray-800 hover:text-white transition-colors text-cyan-600/80"
-                                >
-                                    [ + เพิ่มคำด่าเอง ]
-                                </button>
-
-                                <button 
-                                    onClick={toggleAutoLoop}
-                                    className={`px-4 py-2 border rounded transition-all ${autoLoop ? 'bg-red-900/30 border-red-500 text-red-400' : 'border-gray-700 hover:bg-gray-800 text-cyan-600/80'}`}
-                                >
-                                    {autoLoop ? '[ ⏹ STOP AUTO ]' : '[ ▶ START AUTO ]'}
-                                </button>
-                            </div>
-
-                            <div className="text-cyan-600/60">
-                                (Click anywhere for single shot)
-                            </div>
+                            <button onClick={toggleAutoLoop} className={`flex-1 min-w-[140px] py-3 border rounded transition-all font-bold text-sm tracking-wide font-['Kanit'] relative overflow-hidden group ${autoLoop ? 'bg-red-950/40 border-red-500 text-red-400 shadow-[0_0_20px_rgba(220,38,38,0.3)]' : 'bg-gray-900 border-gray-700 text-gray-400 hover:bg-gray-800 hover:border-red-500 hover:text-red-400'}`}>
+                                <span className="relative z-10">{autoLoop ? '■ หยุดระบบ' : '▶ เริ่มด่ารัวๆ'}</span>
+                                {autoLoop && <div className="absolute inset-0 bg-red-500/10 animate-pulse"></div>}
+                            </button>
+                        </div>
+                        
+                        <div className="text-[9px] text-gray-700 tracking-[3px] mt-4 font-['Rajdhani'] uppercase hover:text-red-900 transition-colors cursor-pointer" onClick={() => !isTyping && !inputMode && startTyping()}>
+                            Click screen to trigger manually
                         </div>
 
                     </div>
