@@ -118,12 +118,22 @@
             "บัตรเขย่งหรือคนเขย่งครับเนี่ย",
             "ขอเครื่องคิดเลขใหม่ไหมครับ?",
             "Loading 99%... (ค้างมา 4 ปีแล้ว)",
-            /* ลบคำว่า Error ออกแล้วครับ */
+            "ต้องใช้ AI ช่วยทำงาน หรือต้องใช้คนมี I ทำงานครับ?"
         ];
-        const SUBJECTS = ["กกต.", "7 เสือ", "คณะกรรมการฯ", "คนจัดเลือกตั้ง", "ระบบรายงานผล", "งบ 6 พันล้าน", "บัตรเลือกตั้ง", "ความโปร่งใส", "คนนับคะแนน", "เครื่องคิดเลข", "เซิร์ฟเวอร์", "ผู้มีอำนาจ", "ตรรกะพวกคุณ", "การทำงานของท่าน", "ระเบียบการเลือกตั้ง", "บัตรเขย่ง", "ผลคะแนน", "สมองคนคิด", "ภาษีประชาชน", "ความรับผิดชอบ"];
-        const VERBS = ["หายไปไหนหมด", "ทำงานเหมือนเต่า", "แดกงบไปเท่าไหร่", "คำนวณมั่วซั่ว", "พังพินาศ", "หมาไม่แดก", "ล่มเก่งเหลือเกิน", "พักผ่อนอยู่เหรอ", "ดูงานเมืองนอก", "ไร้ประสิทธิภาพ", "หน้าด้านจริงๆ", "ทำอะไรกันอยู่", "โกงหน้าด้านๆ", "ปัดความรับผิดชอบ", "คิดเลขไม่เป็น", "ซ่อนคะแนน", "หน่วงความเจริญ", "ถ่วงเวลา", "ไม่เห็นหัวประชาชน", "ทำงานชุ่ยๆ"];
-        const OBJECTS = ["ครับท่าน", "จนน่าเกลียด", "แบบงงๆ", "ยับเยิน", "ชิบหายวายปวง", "จนกูงง", "ไม่อายฟ้าดิน", "ให้เด็กอนุบาลทำยังดีกว่า", "เสียดายภาษี", "น่าสมเพช", "เละเทะไปหมด", "ทุเรศลูกตา", "เกินเยียวยา", "แบบไร้ยางอาย", "เห็นแล้วท้อ", "มืดมนอนธการ", "ต่ำตม", "หาความเจริญไม่เจอ", "เน่าเฟะ", "อัปยศอดสู"];
-        const ENDINGS = ["ไอ้สัส", "ไอ้เวร", "ควยยย", "ถุย", "ลาออกไปเถอะ", "ถามจริ๊ง?", "เลิกตอแหลได้แล้ว", "เอาตีนคิดเหรอ", "จริงๆ นะจ๊ะ", "ส้นตีนมาก", "เหนื่อยใจว่ะ", "ขอร้องล่ะ", "จบนะ", "อย่าแถ", "จำใส่สมองไว้", "ประชาชนดูอยู่", "บาปกรรมมีจริง", "อายหมามันบ้าง", "ไอ้หน้าไม่อาย", "สาสสส"];
+        
+        // --- เพิ่มคลังคำศัพท์ให้เยอะขึ้น (ลดโอกาสซ้ำ) ---
+        const SUBJECTS = [
+            "กกต.", "7 เสือ", "คณะกรรมการฯ", "คนจัดเลือกตั้ง", "ระบบรายงานผล", "งบ 6 พันล้าน", "บัตรเลือกตั้ง", "ความโปร่งใส", "คนนับคะแนน", "เครื่องคิดเลข", "เซิร์ฟเวอร์", "ผู้มีอำนาจ", "ตรรกะพวกคุณ", "การทำงานของท่าน", "ระเบียบการเลือกตั้ง", "บัตรเขย่ง", "ผลคะแนน", "สมองคนคิด", "ภาษีประชาชน", "ความรับผิดชอบ", "เลขาฯ กกต.", "งบดูงานต่างประเทศ", "ผู้ใหญ่ในบ้านเมือง", "ระบบไอที", "คนคุมกฎ"
+        ];
+        const VERBS = [
+            "หายไปไหนหมด", "ทำงานเหมือนเต่า", "แดกงบไปเท่าไหร่", "คำนวณมั่วซั่ว", "พังพินาศ", "หมาไม่แดก", "ล่มเก่งเหลือเกิน", "พักผ่อนอยู่เหรอ", "ดูงานเมืองนอก", "ไร้ประสิทธิภาพ", "หน้าด้านจริงๆ", "ทำอะไรกันอยู่", "โกงหน้าด้านๆ", "ปัดความรับผิดชอบ", "คิดเลขไม่เป็น", "ซ่อนคะแนน", "หน่วงความเจริญ", "ถ่วงเวลา", "ไม่เห็นหัวประชาชน", "ทำงานชุ่ยๆ", "ลาออกเถอะ", "กลับไปนอน", "ดองเรื่องเก่ง", "ทำงานเอาหน้า"
+        ];
+        const OBJECTS = [
+            "ครับท่าน", "จนน่าเกลียด", "แบบงงๆ", "ยับเยิน", "ชิบหายวายปวง", "จนกูงง", "ไม่อายฟ้าดิน", "ให้เด็กอนุบาลทำยังดีกว่า", "เสียดายภาษี", "น่าสมเพช", "เละเทะไปหมด", "ทุเรศลูกตา", "เกินเยียวยา", "แบบไร้ยางอาย", "เห็นแล้วท้อ", "มืดมนอนธการ", "ต่ำตม", "หาความเจริญไม่เจอ", "เน่าเฟะ", "อัปยศอดสู", "รกสภา", "หนักแผ่นดิน", "เสียเวลาเปล่า", "ไม่คุ้มค่าข้าว"
+        ];
+        const ENDINGS = [
+            "ไอ้สัส", "ไอ้เวร", "ควยยย", "ถุย", "ลาออกไปเถอะ", "ถามจริ๊ง?", "เลิกตอแหลได้แล้ว", "เอาตีนคิดเหรอ", "จริงๆ นะจ๊ะ", "ส้นตีนมาก", "เหนื่อยใจว่ะ", "ขอร้องล่ะ", "จบนะ", "อย่าแถ", "จำใส่สมองไว้", "ประชาชนดูอยู่", "บาปกรรมมีจริง", "อายหมามันบ้าง", "ไอ้หน้าไม่อาย", "สาสสส", "ไปตายซะ", "สำเหนียกบ้าง", "กระจอกแท้"
+        ];
 
         const CopyIcon = () => (<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>);
 
@@ -157,16 +167,37 @@
             const typingIntervalRef = useRef(null);
             const autoLoopRef = useRef(null);
             const inputRef = useRef(null);
+            
+            // ใช้ Ref เก็บ history เพื่อเช็คค่าล่าสุดได้ทันทีโดยไม่ต้องรอ re-render
+            const historyRef = useRef([]);
 
             const generateText = () => {
-                const rand = Math.random();
-                if (customPhrases.length > 0 && rand < 0.2) return customPhrases[Math.floor(Math.random() * customPhrases.length)];
-                if (rand < 0.5) return PRESET_PHRASES[Math.floor(Math.random() * PRESET_PHRASES.length)];
-                const s = SUBJECTS[Math.floor(Math.random() * SUBJECTS.length)];
-                const v = VERBS[Math.floor(Math.random() * VERBS.length)];
-                const o = OBJECTS[Math.floor(Math.random() * OBJECTS.length)];
-                const e = Math.random() > 0.5 ? " " + ENDINGS[Math.floor(Math.random() * ENDINGS.length)] : "";
-                return `${s} ${v} ${o}${e}`;
+                let text = "";
+                let attempts = 0;
+                // พยายามสุ่มใหม่สูงสุด 10 ครั้งถ้าเจอคำซ้ำในประวัติ
+                while(attempts < 10) {
+                    const rand = Math.random();
+                    
+                    if (customPhrases.length > 0 && rand < 0.2) {
+                        text = customPhrases[Math.floor(Math.random() * customPhrases.length)];
+                    } else if (rand < 0.2) { // ลดโอกาสออกคำ Preset เหลือ 20% (เดิม 50%)
+                        text = PRESET_PHRASES[Math.floor(Math.random() * PRESET_PHRASES.length)];
+                    } else {
+                        // เพิ่มน้ำหนักให้การผสมคำเป็น 80% (เพื่อให้ได้คำใหม่ๆ)
+                        const s = SUBJECTS[Math.floor(Math.random() * SUBJECTS.length)];
+                        const v = VERBS[Math.floor(Math.random() * VERBS.length)];
+                        const o = OBJECTS[Math.floor(Math.random() * OBJECTS.length)];
+                        const e = Math.random() > 0.5 ? " " + ENDINGS[Math.floor(Math.random() * ENDINGS.length)] : "";
+                        text = `${s} ${v} ${o}${e}`;
+                    }
+                    
+                    // เช็คว่าคำนี้เคยออกไปแล้วใน 20 ครั้งล่าสุดหรือไม่ (Anti-Repeat Logic)
+                    if (!historyRef.current.includes(text)) {
+                        break; // ถ้าไม่ซ้ำ ก็เอาคำนี้เลย
+                    }
+                    attempts++;
+                }
+                return text;
             };
 
             const startTyping = () => {
@@ -182,6 +213,7 @@
 
                 setIsTyping(true); setDisplayedText(""); 
                 const targetText = generateText();
+                
                 let charIndex = 0; let currentString = "";
                 typingIntervalRef.current = setInterval(() => {
                     if (charIndex < targetText.length) {
@@ -191,7 +223,12 @@
                     } else {
                         clearInterval(typingIntervalRef.current);
                         setIsTyping(false);
-                        setHistory(prev => [targetText, ...prev].slice(0, 30));
+                        
+                        // อัปเดต History ทั้งใน State และ Ref
+                        const newHistory = [targetText, ...historyRef.current].slice(0, 20); // จำแค่ 20 อันล่าสุดเพื่อกันซ้ำ
+                        historyRef.current = newHistory;
+                        setHistory(prev => [targetText, ...prev].slice(0, 30)); // แต่โชว์ในจอ 30 อัน
+                        
                         setInsultCount(prev => prev + 1);
                         if (autoLoopRef.current && !inputMode) {
                             setTimeout(() => { if (autoLoopRef.current && !inputMode) startTyping(); }, 1500);
@@ -234,7 +271,6 @@
                     <div className="flex justify-between items-center px-4 py-3 border-b border-gray-800/50 bg-black/20">
                         <div className="flex items-center gap-3">
                             <div className={`w-2 h-2 rounded-full ${autoLoop ? 'bg-red-500 animate-pulse glow-box' : 'bg-green-500'}`}></div>
-                            {/* --- แก้ตรงนี้เป็น LISHBORN --- */}
                             <span className="text-xs font-bold text-gray-400 font-['Rajdhani'] tracking-[2px]">LISHBORN</span>
                         </div>
                         <div className="flex items-center gap-4">
@@ -330,3 +366,4 @@
     </script>
 </body>
 </html>
+
